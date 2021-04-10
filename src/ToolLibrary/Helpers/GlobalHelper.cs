@@ -17,8 +17,6 @@ namespace ToolLibrary.Helpers
             if (!Directory.Exists(GlobalToolConfig.MainDirectory))
             {
                 Directory.CreateDirectory(GlobalToolConfig.MainDirectory);
-                Directory.CreateDirectory(GlobalToolConfig.TxtDirectory);
-                Directory.CreateDirectory(GlobalToolConfig.ImagesDirectory);
                 ret = false;
             }
 
