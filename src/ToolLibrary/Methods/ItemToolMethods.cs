@@ -15,87 +15,16 @@ namespace ToolLibrary.Methods
     public class ItemToolMethods
     {
         #region Initialize
-        public static Task GetTxt()
-		{
-            List<string[]> List = new();
-			using (StreamReader streamReader = new StreamReader(ItemToolConfig.TxtFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
-			{
-				string text;
-				while ((text = streamReader.ReadLine()) != null)
-				{
-                    List.Add(text.Split(GlobalToolConfig.Separation, StringSplitOptions.None));
-				}
-			}
-            ItemToolCache.ZtsValues = List;
-			return Task.CompletedTask;
-		}
-
-        public static Task GetDat()
+        public static Task Initialize()
         {
-            List<ItemEntity> items = new();
-
-            using (var npcIdStream = new StreamReader(ItemToolConfig.DatFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
+            if (!GlobalHelper.CheckIfDirectoryExist().Result)
             {
-                ItemEntity item = new();
-                bool itemAreaBegin = false;
-
-                string line;
-                while ((line = npcIdStream.ReadLine()) != null)
-                {
-                    string[] currentLine = line.Split(GlobalToolConfig.Separation);
-
-                    if (currentLine.Length > 3 && currentLine[1] == "VNUM")
-                    {
-                        itemAreaBegin = true;
-                        item.Vnum = short.Parse(currentLine[2]);
-                        item.Price = long.Parse(currentLine[3]);
-                    }
-                    else if (currentLine.Length > 1 && currentLine[1] == "END")
-                    {
-                        if (!itemAreaBegin)
-                        {
-                            continue;
-                        }
-
-                        items.Add(item);
-
-                        item = new ItemEntity();
-                        itemAreaBegin = false;
-                    }
-                    else if (currentLine.Length > 2 && currentLine[1] == "NAME")
-                    {
-                        item.NameZts = currentLine[2];
-                    }
-                    else if (currentLine.Length > 7 && currentLine[1] == "INDEX")
-                    {
-                        FillMorphAndIndexValues(currentLine, item);
-                    }
-                    else if (currentLine.Length > 3 && currentLine[1] == "TYPE")
-                    {
-
-                        // currentLine[2] 0-range 2-range 3-magic
-                        item.Class = item.EquipmentSlot == EquipmentType.Fairy
-                            ? (byte)15
-                            : Convert.ToByte(currentLine[3]);
-                    }
-                    else if (currentLine.Length > 3 && currentLine[1] == "FLAG")
-                    {
-                        FillFlags(item, currentLine);
-                    }
-                    else if (currentLine.Length > 1 && currentLine[1] == "DATA")
-                    {
-                        FillData(item, currentLine);
-                    }
-                    else if (currentLine[0] != "~" && currentLine[0] != "#========================================================" && currentLine[0].Contains("zts"))
-                    {
-                        item.DescriptionZts = currentLine[0];
-                    }
-                }
-                ItemToolCache.Items = items;
-                return Task.CompletedTask;
+                Environment.Exit(1);
             }
+            GetDat();
+            ReloadTxt();
+            return Task.CompletedTask;
         }
-        
         private static void FillFlags(ItemEntity item, string[] currentLine)
         {
             item.IsSoldable = currentLine[5] == "0";
@@ -1304,27 +1233,135 @@ namespace ToolLibrary.Methods
                     break;
             }
         }
+
+        public static Task GetDat()
+        {
+            List<ItemEntity> items = new();
+
+            using (var npcIdStream = new StreamReader(ItemToolConfig.DatFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
+            {
+                ItemEntity item = new();
+                bool itemAreaBegin = false;
+
+                string line;
+                while ((line = npcIdStream.ReadLine()) != null)
+                {
+                    string[] currentLine = line.Split(GlobalToolConfig.Separation);
+
+                    if (currentLine.Length > 3 && currentLine[1] == "VNUM")
+                    {
+                        itemAreaBegin = true;
+                        item.Vnum = short.Parse(currentLine[2]);
+                        item.Price = long.Parse(currentLine[3]);
+                    }
+                    else if (currentLine.Length > 1 && currentLine[1] == "END")
+                    {
+                        if (!itemAreaBegin)
+                        {
+                            continue;
+                        }
+
+                        items.Add(item);
+
+                        item = new ItemEntity();
+                        itemAreaBegin = false;
+                    }
+                    else if (currentLine.Length > 2 && currentLine[1] == "NAME")
+                    {
+                        item.NameZts = currentLine[2];
+                    }
+                    else if (currentLine.Length > 7 && currentLine[1] == "INDEX")
+                    {
+                        FillMorphAndIndexValues(currentLine, item);
+                    }
+                    else if (currentLine.Length > 3 && currentLine[1] == "TYPE")
+                    {
+
+                        // currentLine[2] 0-range 2-range 3-magic
+                        item.Class = item.EquipmentSlot == EquipmentType.Fairy
+                            ? (byte)15
+                            : Convert.ToByte(currentLine[3]);
+                    }
+                    else if (currentLine.Length > 3 && currentLine[1] == "FLAG")
+                    {
+                        FillFlags(item, currentLine);
+                    }
+                    else if (currentLine.Length > 1 && currentLine[1] == "DATA")
+                    {
+                        FillData(item, currentLine);
+                    }
+                    else if (currentLine[0] != "~" && currentLine[0] != "#========================================================" && currentLine[0].Contains("zts"))
+                    {
+                        item.DescriptionZts = currentLine[0];
+                    }
+                }
+                ItemToolCache.Items = items;
+                return Task.CompletedTask;
+            }
+        }
         #endregion
 
         public static Task<ItemEntity> GetByVNum(short vnum)
         {
             ItemEntity shitty = ItemToolCache.Items.Where(s => s.Vnum.Equals(vnum)).FirstOrDefault();
-            shitty.Name = GetZtsValue(shitty.NameZts).Result;
-            shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
+            AddStringsValues(shitty);
             return Task.FromResult(new ItemEntity());
         }
         public static Task<ItemEntity> GetByName(string name)
         {
             string[] ztsvalue = ItemToolCache.ZtsValues.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
             ItemEntity shitty = ItemToolCache.Items.Where(s => s.NameZts.Equals(ztsvalue[0])).FirstOrDefault();
-            shitty.Name = ztsvalue[1];
-            shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
+            AddStringsValues(shitty);
             return Task.FromResult(new ItemEntity());
         }
 
+        public static Task ReloadTxt()
+        {
+            List<string[]> NameList = new();
+
+            using (StreamReader streamReader = new StreamReader(ItemToolConfig.TxtFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
+            {
+                string text;
+                while ((text = streamReader.ReadLine()) != null)
+                {
+                    NameList.Add(text.Split(GlobalToolConfig.Separation, StringSplitOptions.None));
+                }
+            }
+
+            ItemToolCache.ZtsValues = NameList;
+
+            List<ItemEntity> ItemList = new();
+
+            foreach(ItemEntity Entity in ItemToolCache.Items.OrderBy(s => s.Vnum))
+            {
+                AddStringsValues(Entity);
+                ItemList.Add(Entity);
+            }
+
+            ItemToolCache.Items = ItemList;
+
+            return Task.CompletedTask;
+        }
+
+        public static Task AddStringsValues(ItemEntity entity)
+        {
+            entity.Name = GetZtsValue(entity.NameZts).Result;
+            entity.Description = "This item dont have description";
+            if (!string.IsNullOrEmpty(entity.DescriptionZts))
+            {
+                entity.Description = GetZtsValue(entity.DescriptionZts).Result;
+            }
+            return Task.CompletedTask;
+        }
         public static Task<string> GetZtsValue(string zts)
         {
-            return Task.FromResult(ItemToolCache.ZtsValues.Where(s => s[0].Equals(zts)).FirstOrDefault()[1]);
+            string ret = "";
+            string[] values = ItemToolCache.ZtsValues.Where(s => s[0].Equals(zts)).FirstOrDefault();
+            if (values != null)
+            {
+                ret = values[1];
+            }
+            return Task.FromResult(ret);
         }
     }
 }
