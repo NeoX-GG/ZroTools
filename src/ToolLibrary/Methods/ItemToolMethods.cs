@@ -842,8 +842,7 @@ namespace ToolLibrary.Methods
             item.ItemType = currentLine[3] != "-1" ? (ItemType)Enum.Parse(typeof(ItemType), $"{(short)item.Type}{currentLine[3]}") : ItemType.Weapon;
             item.ItemSubType = Convert.ToByte(currentLine[4]);
             item.EquipmentSlot = (EquipmentType)Enum.Parse(typeof(EquipmentType), currentLine[5] != "-1" ? currentLine[5] : "0");
-
-            // item.IconId = Convert.ToInt16(currentLine[6]);
+            item.Image = currentLine[6];
             switch (item.Vnum)
             {
                 case 4101:
@@ -1305,16 +1304,15 @@ namespace ToolLibrary.Methods
         {
             ItemEntity shitty = ItemToolCache.Items.Where(s => s.Vnum.Equals(vnum)).FirstOrDefault();
             AddStringsValues(shitty);
-            return Task.FromResult(new ItemEntity());
+            return Task.FromResult(shitty);
         }
         public static Task<ItemEntity> GetByName(string name)
         {
             string[] ztsvalue = ItemToolCache.ZtsValues.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
             ItemEntity shitty = ItemToolCache.Items.Where(s => s.NameZts.Equals(ztsvalue[0])).FirstOrDefault();
             AddStringsValues(shitty);
-            return Task.FromResult(new ItemEntity());
+            return Task.FromResult(shitty);
         }
-
         public static Task ReloadTxt()
         {
             List<string[]> NameList = new();
@@ -1342,11 +1340,10 @@ namespace ToolLibrary.Methods
 
             return Task.CompletedTask;
         }
-
         public static Task AddStringsValues(ItemEntity entity)
         {
             entity.Name = GetZtsValue(entity.NameZts).Result;
-            entity.Description = "This item dont have description";
+            entity.Description = string.Empty;
             if (!string.IsNullOrEmpty(entity.DescriptionZts))
             {
                 entity.Description = GetZtsValue(entity.DescriptionZts).Result;

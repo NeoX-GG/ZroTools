@@ -4,6 +4,16 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <Version>1.0.30</Version>
+    <Company>Soke</Company>
+    <Authors>ZroFreaks</Authors>
+    <Product>NosTale Tools</Product>
+    <Copyright>Dont need copyrigth, but please, mentioned me in any part if you use it. Thank you</Copyright>
+    <Description>Tools for NosTale private servers</Description>
+    <RepositoryUrl>https://github.com/Soke-Inc/ZroTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

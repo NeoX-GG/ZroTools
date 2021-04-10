@@ -168,11 +168,19 @@ namespace ToolLibrary.Entities
 
         public string Description { get; set; } = "";
 
+        public string Image { get; set; } = "0";
+
         #endregion
 
-        public override string ToString()
+        public string[] ToArrayString
         {
-            return base.ToString();
+            get
+            {
+                return new string[]
+                {
+
+                };
+            }
         }
     }
 }

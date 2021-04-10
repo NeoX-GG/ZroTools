@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using ToolLibrary.Configs;
 using ToolLibrary.Enums;
@@ -54,7 +50,7 @@ namespace ToolLibrary.Helpers
             {
                 return Task.FromResult(1250);
             }
-            if (Region == RegionType.ru)
+            if (Region == RegionType.ru || Region == RegionType.pl)
             {
                 return Task.FromResult(1251);
             }
