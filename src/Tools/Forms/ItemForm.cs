@@ -58,7 +58,7 @@ namespace Tools.Forms
 
         private void RegionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ReloadRegion(RegionComboBox.Text);
+            ReloadRegion();
         }
 
         private void VnumComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -69,6 +69,34 @@ namespace Tools.Forms
         private void NameComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             ChangeItem(SearchType.Name);
+        }
+
+        #endregion
+        
+        #region Key Press
+
+        private void VnumComboBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == Convert.ToChar(Keys.Enter))
+            {
+                ChangeItem(SearchType.Vnum);
+            }
+        }
+
+        private void NameComboBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == Convert.ToChar(Keys.Enter))
+            {
+                ChangeItem(SearchType.Name);
+            }
+        }
+
+        private void RegionComboBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == Convert.ToChar(Keys.Enter))
+            {
+                ReloadRegion();
+            }
         }
 
         #endregion
@@ -114,7 +142,7 @@ namespace Tools.Forms
             return Task.CompletedTask;
         }
 
-        private Task ReloadRegion(string str)
+        private Task ReloadRegion()
         {
             VnumComboBox.Text = "";
             NameComboBox.Text = "";
@@ -125,7 +153,7 @@ namespace Tools.Forms
 
             foreach (RegionType Region in (RegionType[])Enum.GetValues(typeof(RegionType)))
             {
-                if (Region.ToString().Equals(str))
+                if (Region.ToString().Equals(RegionComboBox.Text))
                 {
                     GlobalToolConfig.Region = Region;
                     ItemToolMethods.ReloadTxt();
@@ -137,5 +165,7 @@ namespace Tools.Forms
         }
 
         #endregion
+
+        
     }
 }

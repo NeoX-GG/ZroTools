@@ -49,6 +49,7 @@ namespace Tools.Forms
             this.VnumComboBox.Size = new System.Drawing.Size(121, 23);
             this.VnumComboBox.TabIndex = 0;
             this.VnumComboBox.SelectedIndexChanged += new System.EventHandler(this.VnumComboBox_SelectedIndexChanged);
+            this.VnumComboBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.VnumComboBox_KeyPress);
             // 
             // NameComboBox
             // 
@@ -58,6 +59,7 @@ namespace Tools.Forms
             this.NameComboBox.Size = new System.Drawing.Size(526, 23);
             this.NameComboBox.TabIndex = 1;
             this.NameComboBox.SelectedIndexChanged += new System.EventHandler(this.NameComboBox_SelectedIndexChanged);
+            this.NameComboBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NameComboBox_KeyPress);
             // 
             // ImagePicBox
             // 
@@ -107,6 +109,7 @@ namespace Tools.Forms
             this.RegionComboBox.Size = new System.Drawing.Size(116, 23);
             this.RegionComboBox.TabIndex = 7;
             this.RegionComboBox.SelectedIndexChanged += new System.EventHandler(this.RegionComboBox_SelectedIndexChanged);
+            this.RegionComboBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.RegionComboBox_KeyPress);
             // 
             // OwnerLbl
             // 
