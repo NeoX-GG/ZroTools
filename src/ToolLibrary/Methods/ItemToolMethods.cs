@@ -89,6 +89,10 @@ namespace ToolLibrary.Methods
                     {
                         FillData(item, currentLine);
                     }
+                    else if (currentLine[0] != "~" && currentLine[0] != "#========================================================" && currentLine[0].Contains("zts"))
+                    {
+                        item.DescriptionZts = currentLine[0];
+                    }
                 }
                 return Task.FromResult(items);
             }
@@ -1311,15 +1315,18 @@ namespace ToolLibrary.Methods
             shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
             return Task.FromResult(new ItemEntity());
         }
+        public static Task<ItemEntity> GetByName(string name)
+        {
+            string[] ztsvalue = ItemToolCache.Names.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
+            ItemEntity shitty = ItemToolCache.Items.Where(s => s.NameZts.Equals(ztsvalue[0])).FirstOrDefault();
+            shitty.Name = ztsvalue[1];
+            //shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
+            return Task.FromResult(new ItemEntity());
+        }
 
         public static Task<string> GetZtsValue(string zts)
         {
-            string ups;
-            if (!ItemToolCache.Names.TryGetValue(zts, out ups))
-            {
-                return Task.FromResult(null);
-            }
-            return Task.FromResult(ups);
+            return Task.FromResult(ItemToolCache.Names.Where(s => s[0].Equals(zts)).FirstOrDefault()[1]);
         }
     }
 }
