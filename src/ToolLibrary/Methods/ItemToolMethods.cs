@@ -15,31 +15,28 @@ namespace ToolLibrary.Methods
     public class ItemToolMethods
     {
         #region Initialize
-        public static Task<Dictionary<string, string>> GetTxt()
+        public static Task GetTxt()
 		{
-			Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            List<string[]> List = new();
 			using (StreamReader streamReader = new StreamReader(ItemToolConfig.TxtFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
 			{
 				string text;
 				while ((text = streamReader.ReadLine()) != null)
 				{
-					string[] array = text.Split(GlobalToolConfig.Separation, StringSplitOptions.None);
-					if (array.Length > 1 && !dictionary.ContainsKey(array[0]))
-					{
-						dictionary.Add(array[0], array[1]);
-					}
+                    List.Add(text.Split(GlobalToolConfig.Separation, StringSplitOptions.None));
 				}
 			}
-			return Task.FromResult(dictionary);
+            ItemToolCache.ZtsValues = List;
+			return Task.CompletedTask;
 		}
 
-        public static Task<List<ItemEntity>> GetDat()
+        public static Task GetDat()
         {
-            List<ItemEntity> items = new List<ItemEntity>();
+            List<ItemEntity> items = new();
 
             using (var npcIdStream = new StreamReader(ItemToolConfig.DatFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
             {
-                ItemEntity item = new ItemEntity();
+                ItemEntity item = new();
                 bool itemAreaBegin = false;
 
                 string line;
@@ -94,7 +91,8 @@ namespace ToolLibrary.Methods
                         item.DescriptionZts = currentLine[0];
                     }
                 }
-                return Task.FromResult(items);
+                ItemToolCache.Items = items;
+                return Task.CompletedTask;
             }
         }
         
@@ -1317,16 +1315,16 @@ namespace ToolLibrary.Methods
         }
         public static Task<ItemEntity> GetByName(string name)
         {
-            string[] ztsvalue = ItemToolCache.Names.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
+            string[] ztsvalue = ItemToolCache.ZtsValues.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
             ItemEntity shitty = ItemToolCache.Items.Where(s => s.NameZts.Equals(ztsvalue[0])).FirstOrDefault();
             shitty.Name = ztsvalue[1];
-            //shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
+            shitty.Description = GetZtsValue(shitty.DescriptionZts).Result;
             return Task.FromResult(new ItemEntity());
         }
 
         public static Task<string> GetZtsValue(string zts)
         {
-            return Task.FromResult(ItemToolCache.Names.Where(s => s[0].Equals(zts)).FirstOrDefault()[1]);
+            return Task.FromResult(ItemToolCache.ZtsValues.Where(s => s[0].Equals(zts)).FirstOrDefault()[1]);
         }
     }
 }
