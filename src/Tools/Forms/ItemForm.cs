@@ -23,25 +23,6 @@ namespace Tools.Forms
         {
             InitializeComponent();
             ItemToolMethods.Initialize();
-
-            int RegionIndex = 0;
-
-            foreach (RegionType Region in (RegionType[])Enum.GetValues(typeof(RegionType)))
-            {
-                RegionComboBox.Items.Add(Region.ToString());
-                if (Region != GlobalToolConfig.Region)
-                {
-                    RegionIndex++;
-                    continue;
-                }
-
-                RegionComboBox.SelectedIndex = RegionIndex;
-            }
-
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            VersionLbl.Text = "Version: " + fileVersionInfo.ProductVersion;
-
             Initialize();
         }
 
@@ -105,6 +86,38 @@ namespace Tools.Forms
 
         private Task Initialize()
         {
+            int RegionIndex = 0;
+
+            foreach (RegionType Region in (RegionType[])Enum.GetValues(typeof(RegionType)))
+            {
+                RegionComboBox.Items.Add(Region.ToString());
+                if (Region != GlobalToolConfig.Region)
+                {
+                    RegionIndex++;
+                    continue;
+                }
+
+                RegionComboBox.SelectedIndex = RegionIndex;
+            }
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            VersionLbl.Text = "Version: " + fileVersionInfo.ProductVersion;
+
+            foreach (ItemEntity Entity in ItemToolCache.Items)
+            {
+                if (Entity.Vnum == -1 || string.IsNullOrEmpty(Entity.Name))
+                {
+                    continue;
+                }
+                VnumComboBox.Items.Add(Entity.Vnum);
+                NameComboBox.Items.Add(Entity.Name);
+            }
+            return Task.CompletedTask;
+        }
+
+        private Task ReloadNameComboBox()
+        {
             foreach (ItemEntity Entity in ItemToolCache.Items)
             {
                 if (Entity.Vnum == -1 || string.IsNullOrEmpty(Entity.Name))
@@ -148,7 +161,6 @@ namespace Tools.Forms
             NameComboBox.Text = "";
             DescriptionTxtBox.Text = "";
             ValuesTxtBox.Text = "";
-            VnumComboBox.Items.Clear();
             NameComboBox.Items.Clear();
 
             foreach (RegionType Region in (RegionType[])Enum.GetValues(typeof(RegionType)))
@@ -157,7 +169,8 @@ namespace Tools.Forms
                 {
                     GlobalToolConfig.Region = Region;
                     ItemToolMethods.ReloadTxt();
-                    Initialize();
+
+                    ReloadNameComboBox();
                 }
             }
 
@@ -166,6 +179,5 @@ namespace Tools.Forms
 
         #endregion
 
-        
     }
 }
