@@ -3,10 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToolLibrary.Enums;
 
 namespace ToolLibrary.Configs
 {
-    class GlobalToolConfig
+    public class GlobalToolConfig
     {
-    }
+		public static string MainDirectory = "./Files\\";
+
+		public static string TxtDirectory = MainDirectory + "Txt\\";
+
+		public static string DatDirectory = MainDirectory + "Dat\\";
+
+		public static string ImagesDirectory = MainDirectory + "Images\\";
+
+		public static RegionType Region { get; set; } = RegionType.es;
+
+		public static char Separation = '\t';
+	}
 }

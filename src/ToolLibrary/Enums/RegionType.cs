@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace ToolLibrary.Enums
 {
-    class RegionType
+    public enum RegionType : byte
     {
+        uk,
+        de,
+        fr,
+        it,
+        pl,
+        es,
+        cz,
+        ru
     }
 }
