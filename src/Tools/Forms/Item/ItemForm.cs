@@ -124,7 +124,6 @@ namespace Tools.Forms.Items
                 {
                     continue;
                 }
-                VnumComboBox.Items.Add(Entity.Vnum);
                 NameComboBox.Items.Add(Entity.Name);
             }
             return Task.CompletedTask;

@@ -1357,15 +1357,15 @@ namespace ToolLibrary.Methods
 
             ItemToolTempData.ZtsValues = NameList;
 
-            List<ItemEntity> ItemList = ItemToolTempData.Items;
+            List<ItemEntity> ItemList = new();
 
-            ItemToolTempData.Items.Clear();
-
-            foreach(ItemEntity Entity in ItemList)
+            foreach(ItemEntity Entity in ItemToolTempData.Items)
             {
                 AddStringsValues(Entity);
-                ItemToolTempData.Items.Add(Entity);
+                ItemList.Add(Entity);
             }
+
+            ItemToolTempData.Items = ItemList;
 
             return Task.CompletedTask;
         }
