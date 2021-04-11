@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using ToolLibrary.Configs;
 using ToolLibrary.Enums;
 
 namespace ToolLibrary.Entities
@@ -78,6 +82,8 @@ namespace ToolLibrary.Entities
         public bool Flag7 { get; set; }
 
         public bool Flag8 { get; set; }
+
+        public bool Flag10 { get; set; }
 
         public bool IsConsumable { get; set; }
 
@@ -173,17 +179,30 @@ namespace ToolLibrary.Entities
 
         public List<BCardEntity> BCards { get; set; } = new List<BCardEntity>();
 
+        public bool IsAreaBegin { get; set; } = false;
+
+        public byte Unknown1 { get; set; }
+        public byte Unknown2 { get; set; }
+        public bool Flag11 { get; set; }
+        public bool Flag12 { get; set; }
+        public bool Flag13 { get; set; }
+
         #endregion
 
-        public string[] ToArrayString
+        public override string ToString()
         {
-            get
-            {
-                return new string[]
-                {
-
-                };
-            }
+            char s = GlobalToolConfig.Separation;
+            return $"{s}VNUM{s}{Vnum}{s}{Price}\n" +
+                   $"{s}NAME{s}{NameZts}\n" +
+                   $"{s}INDEX{s}{(byte)Type}{s}{(byte)ItemType}{s}{ItemSubType}{s}{EquipmentSlot}{s}{Image}\n" +
+                   $"{s}TYPE{s}{Unknown1}{s}{Class}\n" +//need check
+                   $"{s}FLAG{s}{Flag11}{s}{Flag12}{s}{Flag13}{s}{(IsSoldable ? 0 : 1)}{s}{(IsDroppable ? 0 : 1)}{s}{(IsTradable ? 0 : 1)}{s}{(IsMinilandActionable ? 1 : 0)}{s}{(IsWarehouse ? 1 : 0)}{s}{(Flag9 ? 1 : 0)}{s}{(Flag1 ? 1 : 0)}{s}{(Flag2 ? 1 : 0)}{s}{(Flag3 ? 1 : 0)}{(Flag4 ? 1 : 0)}{s}{(Flag5 ? "1" : 0)}{s}{(IsColored ? 1 : 0)}{s}{(Sex == 2 ? $"1{s}0" : Sex == 1 ? $"0{s}1" : $"0{s}0")}{s}{(Flag10 ? 1 : 0)}{s}{(Flag6 ? 1 : 0)}{s}{(ReputPrice != 0 ? 1 : 0)}{s}{(IsHeroic ? 1 : 0)}{s}{(Flag7 ? "1" : "0")}{s}{(Flag8 ? "1" : "0")}\n" +//need know the others values
+                   $"{s}DATA\n" +
+                   $"{s}BUFF\n" +
+                   $"{s}LINEDESC{s}\n{Unknown2}" +
+                   $"{(!string.IsNullOrEmpty(DescriptionZts) ? DescriptionZts : "")}" +
+                   $"{s}END" +
+                   $"#========================================================";
         }
     }
 }

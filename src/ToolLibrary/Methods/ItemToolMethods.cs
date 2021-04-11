@@ -25,8 +25,12 @@ namespace ToolLibrary.Methods
             ReloadTxt();
             return Task.CompletedTask;
         }
+
         private static void FillFlags(ItemEntity item, string[] currentLine)
         {
+            item.Flag11 = currentLine[2] == "1";
+            item.Flag12 = currentLine[3] == "1";
+            item.Flag13 = currentLine[4] == "1";
             item.IsSoldable = currentLine[5] == "0";
             item.IsDroppable = currentLine[6] == "0";
             item.IsTradable = currentLine[7] == "0";
@@ -39,9 +43,8 @@ namespace ToolLibrary.Methods
             item.Flag4 = currentLine[14] == "1";
             item.Flag5 = currentLine[15] == "1";
             item.IsColored = currentLine[16] == "1";
-            item.Sex = currentLine[18] == "1" ? (byte)1 :
-                currentLine[17] == "1" ? (byte)2 : (byte)0;
-            //not used item.Flag6 = currentLine[19] == "1";
+            item.Sex = currentLine[17] == "1" ? (byte)2 : currentLine[18] == "1" ? (byte)1 : (byte)0;
+            item.Flag10 = currentLine[19] == "1";
             item.Flag6 = currentLine[20] == "1";
             if (currentLine[21] == "1")
             {
@@ -1240,7 +1243,6 @@ namespace ToolLibrary.Methods
             using (var npcIdStream = new StreamReader(ItemToolConfig.DatFile, CodePagesEncodingProvider.Instance.GetEncoding(GlobalHelper.GetEncoding().Result)))
             {
                 ItemEntity item = new();
-                bool itemAreaBegin = false;
 
                 string line;
                 while ((line = npcIdStream.ReadLine()) != null)
@@ -1249,13 +1251,13 @@ namespace ToolLibrary.Methods
 
                     if (currentLine.Length > 3 && currentLine[1] == "VNUM")
                     {
-                        itemAreaBegin = true;
+                        item.IsAreaBegin = true;
                         item.Vnum = short.Parse(currentLine[2]);
                         item.Price = long.Parse(currentLine[3]);
                     }
                     else if (currentLine.Length > 1 && currentLine[1] == "END")
                     {
-                        if (!itemAreaBegin)
+                        if (!item.IsAreaBegin)
                         {
                             continue;
                         }
@@ -1263,7 +1265,7 @@ namespace ToolLibrary.Methods
                         items.Add(item);
 
                         item = new ItemEntity();
-                        itemAreaBegin = false;
+                        item.IsAreaBegin = false;
                     }
                     else if (currentLine.Length > 2 && currentLine[1] == "NAME")
                     {
@@ -1275,8 +1277,7 @@ namespace ToolLibrary.Methods
                     }
                     else if (currentLine.Length > 3 && currentLine[1] == "TYPE")
                     {
-
-                        // currentLine[2] 0-range 2-range 3-magic
+                        item.Unknown1 = byte.Parse(currentLine[2]);
                         item.Class = item.EquipmentSlot == EquipmentType.Fairy
                             ? (byte)15
                             : Convert.ToByte(currentLine[3]);
@@ -1302,6 +1303,7 @@ namespace ToolLibrary.Methods
                 return Task.CompletedTask;
             }
         }
+
         private static void FillBuff(IReadOnlyList<string> currentLine, ItemEntity item)
         {
             for (int i = 0; i < 5; i++)
@@ -1328,6 +1330,7 @@ namespace ToolLibrary.Methods
                 item.BCards.Add(itemCard);
             }
         }
+
         #endregion
 
         public static Task<ItemEntity> GetByVNum(short vnum)
@@ -1372,7 +1375,12 @@ namespace ToolLibrary.Methods
 
         public static Task AddStringsValues(ItemEntity entity)
         {
-            entity.Name = GetZtsValue(entity.NameZts).Result;
+            entity.Name = string.Empty; 
+            if (!string.IsNullOrEmpty(entity.NameZts))
+            {
+                entity.Name = GetZtsValue(entity.NameZts).Result;
+            }
+
             entity.Description = string.Empty;
             if (!string.IsNullOrEmpty(entity.DescriptionZts))
             {
