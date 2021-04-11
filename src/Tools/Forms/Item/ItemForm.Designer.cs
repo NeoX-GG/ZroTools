@@ -1,5 +1,5 @@
 ﻿
-namespace Tools.Forms
+namespace Tools.Forms.Items
 {
     partial class ItemForm
     {

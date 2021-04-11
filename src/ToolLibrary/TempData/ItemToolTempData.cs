@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using ToolLibrary.Entities;
 
-namespace ToolLibrary.Caches
+namespace ToolLibrary.TempData
 {
-    public class ItemToolCache
+    public class ItemToolTempData
     {
         public static List<string[]> ZtsValues = new();
 

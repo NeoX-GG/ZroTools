@@ -1,4 +1,5 @@
-﻿using ToolLibrary.Enums;
+﻿using System.Collections.Generic;
+using ToolLibrary.Enums;
 
 namespace ToolLibrary.Entities
 {
@@ -169,6 +170,8 @@ namespace ToolLibrary.Entities
         public string Description { get; set; } = "";
 
         public string Image { get; set; } = "0";
+
+        public List<BCardEntity> BCards { get; set; } = new List<BCardEntity>();
 
         #endregion
 

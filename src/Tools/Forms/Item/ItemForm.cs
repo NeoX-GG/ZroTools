@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ToolLibrary.Caches;
+using ToolLibrary.TempData;
 using ToolLibrary.Entities;
 using ToolLibrary.Methods;
 using ToolLibrary.Enums;
@@ -9,13 +9,13 @@ using ToolLibrary.Configs;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace Tools.Forms
+namespace Tools.Forms.Items
 {
     public partial class ItemForm : Form
     {
         #region Properties
 
-        ItemEntity Item = null;
+        ItemEntity Item = new();
 
         #endregion
 
@@ -39,7 +39,7 @@ namespace Tools.Forms
 
         private void RegionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ReloadRegion();
+            ChangeRegion();
         }
 
         private void VnumComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -76,7 +76,7 @@ namespace Tools.Forms
         {
             if (e.KeyChar == Convert.ToChar(Keys.Enter))
             {
-                ReloadRegion();
+                ChangeRegion();
             }
         }
 
@@ -104,7 +104,7 @@ namespace Tools.Forms
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
             VersionLbl.Text = "Version: " + fileVersionInfo.ProductVersion;
 
-            foreach (ItemEntity Entity in ItemToolCache.Items)
+            foreach (ItemEntity Entity in ItemToolTempData.Items)
             {
                 if (Entity.Vnum == -1 || string.IsNullOrEmpty(Entity.Name))
                 {
@@ -118,7 +118,7 @@ namespace Tools.Forms
 
         private Task ReloadNameComboBox()
         {
-            foreach (ItemEntity Entity in ItemToolCache.Items)
+            foreach (ItemEntity Entity in ItemToolTempData.Items)
             {
                 if (Entity.Vnum == -1 || string.IsNullOrEmpty(Entity.Name))
                 {
@@ -155,7 +155,7 @@ namespace Tools.Forms
             return Task.CompletedTask;
         }
 
-        private Task ReloadRegion()
+        private Task ChangeRegion()
         {
             VnumComboBox.Text = "";
             NameComboBox.Text = "";

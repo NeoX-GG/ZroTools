@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToolLibrary.Caches;
+using ToolLibrary.TempData;
 using ToolLibrary.Configs;
 using ToolLibrary.Entities;
 using ToolLibrary.Enums;
@@ -1289,30 +1289,59 @@ namespace ToolLibrary.Methods
                     {
                         FillData(item, currentLine);
                     }
+                    else if (currentLine.Length > 1 && currentLine[1] == "BUFF")
+                    {
+                        FillBuff(currentLine, item);
+                    }
                     else if (currentLine[0] != "~" && currentLine[0] != "#========================================================" && currentLine[0].Contains("zts"))
                     {
                         item.DescriptionZts = currentLine[0];
                     }
                 }
-                ItemToolCache.Items = items;
+                ItemToolTempData.Items = items;
                 return Task.CompletedTask;
+            }
+        }
+        private static void FillBuff(IReadOnlyList<string> currentLine, ItemEntity item)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                var type = (byte)Convert.ToInt32(currentLine[2 + 5 * i]);
+                if (type == 0 || type == 255)
+                {
+                    continue;
+                }
+
+                var first = Convert.ToInt32(currentLine[3 + 5 * i]);
+                var itemCard = new BCardEntity
+                {
+                    ItemVNum = item.Vnum,
+                    Type = type,
+                    SubType = (byte)((Convert.ToByte(currentLine[5 + 5 * i]) + 1) * 10 + 1 + (first < 0 ? 1 : 0)),
+                    IsLevelScaled = Convert.ToBoolean(first % 4),
+                    IsLevelDivided = first % 4 == 2,
+                    FirstData = (short)((first > 0 ? first : -first) / 4),
+                    SecondData = (short)(Convert.ToInt32(currentLine[4 + 5 * i]) / 4),
+                    ThirdData = (short)(Convert.ToInt32(currentLine[6 + 5 * i]) / 4),
+                    CastType = Convert.ToByte(currentLine[6 + 5 * i])
+                };
+                item.BCards.Add(itemCard);
             }
         }
         #endregion
 
         public static Task<ItemEntity> GetByVNum(short vnum)
         {
-            ItemEntity shitty = ItemToolCache.Items.Where(s => s.Vnum.Equals(vnum)).FirstOrDefault();
-            AddStringsValues(shitty);
+            ItemEntity shitty = ItemToolTempData.Items.Where(s => s.Vnum.Equals(vnum)).FirstOrDefault();
             return Task.FromResult(shitty);
         }
+
         public static Task<ItemEntity> GetByName(string name)
         {
-            string[] ztsvalue = ItemToolCache.ZtsValues.Where(s => s[1].ToLower().Contains(name.ToLower())).FirstOrDefault();
-            ItemEntity shitty = ItemToolCache.Items.Where(s => s.NameZts.Equals(ztsvalue[0])).FirstOrDefault();
-            AddStringsValues(shitty);
+            ItemEntity shitty = ItemToolTempData.Items.Where(s => s.Name.ToLower().Contains(name.ToLower())).FirstOrDefault();
             return Task.FromResult(shitty);
         }
+
         public static Task ReloadTxt()
         {
             List<string[]> NameList = new();
@@ -1326,20 +1355,21 @@ namespace ToolLibrary.Methods
                 }
             }
 
-            ItemToolCache.ZtsValues = NameList;
+            ItemToolTempData.ZtsValues = NameList;
 
-            List<ItemEntity> ItemList = new();
+            List<ItemEntity> ItemList = ItemToolTempData.Items;
 
-            foreach(ItemEntity Entity in ItemToolCache.Items.OrderBy(s => s.Vnum))
+            ItemToolTempData.Items.Clear();
+
+            foreach(ItemEntity Entity in ItemList)
             {
                 AddStringsValues(Entity);
-                ItemList.Add(Entity);
+                ItemToolTempData.Items.Add(Entity);
             }
-
-            ItemToolCache.Items = ItemList;
 
             return Task.CompletedTask;
         }
+
         public static Task AddStringsValues(ItemEntity entity)
         {
             entity.Name = GetZtsValue(entity.NameZts).Result;
@@ -1350,10 +1380,11 @@ namespace ToolLibrary.Methods
             }
             return Task.CompletedTask;
         }
+
         public static Task<string> GetZtsValue(string zts)
         {
             string ret = "";
-            string[] values = ItemToolCache.ZtsValues.Where(s => s[0].Equals(zts)).FirstOrDefault();
+            string[] values = ItemToolTempData.ZtsValues.Where(s => s[0].Equals(zts)).FirstOrDefault();
             if (values != null)
             {
                 ret = values[1];
