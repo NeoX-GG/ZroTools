@@ -20,4 +20,8 @@
     <ProjectReference Include="..\ToolLibrary\ToolLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Forms\Packet\" />
+  </ItemGroup>
+
 </Project>
