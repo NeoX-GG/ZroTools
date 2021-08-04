@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Forms;
-using Tools.Forms.Items;
+using Tools.Forms;
 
 namespace Tools
 {
@@ -15,7 +15,7 @@ namespace Tools
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ItemForm());
+            Application.Run(new MainForm());
         }
     }
 }

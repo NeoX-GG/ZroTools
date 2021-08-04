@@ -12,6 +12,8 @@ namespace ToolLibrary.Configs
 
 		public static string ImagesDirectory = MainDirectory + "Images\\";
 
+		public static string PacketDirectory = MainDirectory + "Packet\\packet.txt";
+
 		public static RegionType Region { get; set; } = RegionType.es;
 
 		public static char Separation = '\t';
