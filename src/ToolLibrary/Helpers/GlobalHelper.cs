@@ -34,6 +34,12 @@ namespace ToolLibrary.Helpers
                 ret = false;
             }
 
+            if (!Directory.Exists(GlobalToolConfig.PacketDirectory))
+            {
+                Directory.CreateDirectory(GlobalToolConfig.PacketDirectory);
+                ret = false;
+            }
+
             if (!Directory.Exists(ItemToolConfig.ImgDir))
             {
                 Directory.CreateDirectory(ItemToolConfig.ImgDir);

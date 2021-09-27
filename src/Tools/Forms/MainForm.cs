@@ -40,7 +40,7 @@ namespace Tools.Forms
                 return;
             }
             List<string> list = new();
-            using (StreamReader streamReader = new StreamReader(GlobalToolConfig.TxtDirectory))
+            using (StreamReader streamReader = new StreamReader(GlobalToolConfig.PacketDirectory))
             {
                 string text;
                 while ((text = streamReader.ReadLine()) != null)
